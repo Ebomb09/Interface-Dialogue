@@ -1,0 +1,8 @@
+[Section1]
+Shop Keeper: “How can I help you”
+x = Select(“Buy” “No”)
+if(x == 0) Goto(Section1-Buy)
+if(x == 1) Goto(Section1-No)
+
+[Section1-Buy]
+gold -= 100
