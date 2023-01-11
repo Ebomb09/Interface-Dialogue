@@ -2,6 +2,7 @@
 #define DIALOGUE_INTERACTIONS_H
 
 #include <string>
+#include <vector>
 
 /****
  * Defines the dialogue class to be used for handling text playback
@@ -11,6 +12,7 @@ class dialogue{
 
 private:
 	std::string speaker, text, current_section;
+	std::vector<std::string> options;
 	//map
 
 public:
@@ -30,7 +32,7 @@ public:
 	const std::string& getText();
 
 	int getNumberofOptions();
-	bool getOption(int index);
+	const std::string& getOptionText(int index);
 	void select(int option);
 };
 
