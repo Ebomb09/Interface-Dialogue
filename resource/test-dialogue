@@ -1,8 +1,11 @@
 [Section1]
-Shop Keeper: “How can I help you”
-x = Select(“Buy” “No”)
-if(x == 0) Goto(Section1-Buy)
-if(x == 1) Goto(Section1-No)
+Shop Keeper: "How can I help you"
+Guy:"I am Hungry"
+Shop Keeper: "For what you little cretin?"
+Guy:  "Meetza Pizza"
+Ethan: "Bruh what's wrong with you"
+x = "Buy the meetza pizza" "Don't Buy"
 
 [Section1-Buy]
+
 gold -= 100

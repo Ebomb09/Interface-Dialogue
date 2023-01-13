@@ -1,39 +1,63 @@
 #ifndef DIALOGUE_INTERACTIONS_H
 #define DIALOGUE_INTERACTIONS_H
 
-#include <string>
+#include <cstring>
 #include <vector>
-#include <fstream>
+
+enum keywordIdentifiers{
+	None,
+	Section,
+	Dialogue,
+	Option
+};
+
+struct keyword{
+	int type = None;
+
+	union{
+		struct{
+			char* name;
+		} section;
+
+		struct{
+			char* speaker;
+			char* text;
+		} dialogue;
+
+		struct{
+			char* variable;
+			char** options;
+			int count;
+		} option;
+	};
+};
 
 /****
  * Defines the dialogue class to be used for handling text playback
  * similar to popular RPGs.
  */
-class dialogue{
+class handler{
 
 private:
-	std::string speaker, text, current_section;
-	std::vector<std::string> options;
-	std::ifstream file;
+	int position;
+	std::vector<keyword> keywords;
 
 public:
-	bool openFile(const std::string name);
-	bool closeFile();
+	bool openFile(const char* name);
 
-	bool bindString(const std::string, std::string* ptr);
-	bool bindInt(const std::string, int* ptr);
+	bool bindString(const char* var, std::string* ptr);
+	bool bindInt(const char* var, int* ptr);
 
-	enum readState{
-		Done,
-		More,
-		Option
-	};
-	int read(const std::string& section = "");
-	const std::string& getSpeaker();
-	const std::string& getText();
+	/* Process control */
+	bool gotoSection(const char* sectionName = "");
+	int next();
 
-	int getNumberofOptions();
-	const std::string& getOptionText(int index);
+	/* Getters */
+	const char* getSpeaker();
+	const char* getText();
+
+	int getOptionCount();
+	const char* getOptionText(int index);
 	void select(int option);
 };
 
