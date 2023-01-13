@@ -3,10 +3,19 @@
 INCLUDE_DIR = include
 LIBRARY_DIR = lib
 
-all: lib/libdialogue.a bin/test
+all: lib bin obj lib/libdialogue.a bin/test
 
 clean:
 	rm bin/test lib/libdialogue.a obj/test.o obj/dialogue.o
+
+lib:
+	mkdir lib
+
+obj:
+	mkdir obj
+
+bin:
+	mkdir bin
 
 lib/libdialogue.a: obj/dialogue.o
 	ar rcs "$@" "$<"
