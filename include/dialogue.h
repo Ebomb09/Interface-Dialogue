@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
 /****
  * Defines the dialogue class to be used for handling text playback
@@ -13,7 +14,7 @@ class dialogue{
 private:
 	std::string speaker, text, current_section;
 	std::vector<std::string> options;
-	//map
+	std::ifstream file;
 
 public:
 	bool openFile(const std::string name);
