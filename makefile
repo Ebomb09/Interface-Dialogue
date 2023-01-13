@@ -5,6 +5,9 @@ LIBRARY_DIR = lib
 
 all: lib/libdialogue.a bin/test
 
+clean:
+	rm bin/test lib/libdialogue.a obj/test.o obj/dialogue.o
+
 lib/libdialogue.a: obj/dialogue.o
 	ar rcs "$@" "$<"
 
