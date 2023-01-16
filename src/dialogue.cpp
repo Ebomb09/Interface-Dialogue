@@ -57,21 +57,72 @@ bool handler::openFile(const char* name){
 		switch(mode){
 
 			default:
-			case None:
-			{
+			case None:{
 
 				// Found a possible Section Header
 				if(buffer[i] == '['){
-					mode = Section;
 					start = i + 1;
+					mode = Section;
 				}
 
 				if(buffer[i] == ':' && startline != i){
-					mode = Dialogue;
 					start = startline;
 					end = i-1;
 
 					quote_start = -1;
+					mode = Dialogue;
+				}
+
+				if(buffer[i] == '='){
+
+					// Find variable name
+					start = -1;
+					end = -1;
+
+					for(int j = startline; j < length; j ++){
+
+						if(buffer[j] != ' ' && buffer[j] != '\t'){
+
+							if(start == -1){
+								start = j;
+
+							}else{
+								end = j;
+							}
+						}
+					}
+					
+					// Find number of options
+					int number_quotes = 0;
+
+					for(int j = i+1; j < length; j ++){
+
+						if(buffer[j] == '"')
+							number_quotes ++;
+						
+						if(buffer[j] == '\n' || j >= length-1)
+							break;
+					}
+
+					if(number_quotes < 2){
+						std::cerr << "Error no options provided\n";
+						break;
+					}
+
+					keyword word;
+					word.type = Option;
+					word.option.count = number_quotes/2;
+					word.option.variable = init_string(buffer, start, end);
+					word.option.options = new char*[number_quotes/2];
+
+					keywords.push_back(word);
+
+					start = keywords.size()-1;
+					end = 0;
+
+					quote_start = -1;
+
+					mode = Option;
 				}
 				break;
 			}
@@ -79,18 +130,16 @@ bool handler::openFile(const char* name){
 			/****
 			 * Looking for a string within the section header
 			 */
-			case Section:
-			{
+			case Section:{
 
 				if(buffer[i] == ']'){
 					mode = None;
 					end = i - 1;
 
 					if(start <= end){
-						char* str = init_string(buffer, start, end);
 						keyword word;
 						word.type = Section;
-						word.section.name = str;
+						word.section.name = init_string(buffer, start, end);
 
 						keywords.push_back(word);
 					}
@@ -107,10 +156,9 @@ bool handler::openFile(const char* name){
 			/****
 			 * Looking for two strings within the dialogue
 			 */
-			case Dialogue:
-			{		
+			case Dialogue:{		
 
-				if(buffer[i] == '"' || buffer[i] == '“' || buffer[i] == '”'){
+				if(buffer[i] == '"'){
 					
 					if(quote_start == -1)
 						quote_start = i+1;
@@ -119,14 +167,33 @@ bool handler::openFile(const char* name){
 						mode = None;
 						quote_end = i-1;
 
-						char* speaker = init_string(buffer, start, end);
-						char* text = init_string(buffer, quote_start, quote_end);
 						keyword word;
 						word.type = Dialogue;
-						word.dialogue.speaker = speaker;
-						word.dialogue.text = text;
+						word.dialogue.speaker = init_string(buffer, start, end);
+						word.dialogue.text = init_string(buffer, quote_start, quote_end);
 
 						keywords.push_back(word);
+					}
+				}
+				break;
+			}
+
+			case Option: {
+
+				if(buffer[i] == '"'){
+
+					if(quote_start == -1){
+						quote_start = i+1;
+
+					}else{
+						quote_end = i-1;
+
+						keywords[start].option.options[end++] = init_string(buffer, quote_start, quote_end);
+
+						quote_start = -1;
+
+						if(end >= keywords[start].option.count)
+							mode = None;
 					}
 				}
 				break;
@@ -145,6 +212,7 @@ bool handler::gotoSection(const char* sectionName){
 	for(int i = 0; i < keywords.size(); i ++){
 
 		if(keywords[i].type == Section && strcmp(sectionName, keywords[i].section.name) == 0){
+			start = i;
 			position = i;
 			return true;
 		}
@@ -156,11 +224,16 @@ bool handler::gotoSection(const char* sectionName){
 
 int handler::next(){
 	position ++;
+	return current();
+}
+
+
+int handler::current(){
 
 	if(position >= keywords.size())
 		return None;
 
-	if(keywords[position].type == Section)
+	if(keywords[position].type == Section && position != start)
 		return None;
 
 	return keywords[position].type;
@@ -196,7 +269,7 @@ int handler::getOptionCount(){
 
 const char* handler::getOptionText(int index){
 
-	if(index >= keywords[position].option.count)
+	if(index >= getOptionCount())
 		return "";
 
 	return keywords[position].option.options[index];

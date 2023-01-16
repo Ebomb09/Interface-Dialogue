@@ -12,9 +12,15 @@ enum keywordIdentifiers{
 };
 
 struct keyword{
-	int type = None;
+	int type;
 
 	union{
+		struct{
+			int x;
+			int y;
+			int z;
+		}generic;
+
 		struct{
 			char* name;
 		} section;
@@ -39,7 +45,7 @@ struct keyword{
 class handler{
 
 private:
-	int position;
+	int start, position;
 	std::vector<keyword> keywords;
 
 public:
@@ -51,6 +57,7 @@ public:
 	/* Process control */
 	bool gotoSection(const char* sectionName = "");
 	int next();
+	int current();
 
 	/* Getters */
 	const char* getSpeaker();

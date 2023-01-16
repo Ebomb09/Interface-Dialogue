@@ -18,7 +18,7 @@ int main(int argc, char* argv[]){
 		
 
 		if(gameLoop == Option){
-
+			
 			for(int i = 0; i < diag.getOptionCount(); i ++){
 				std::cout << "(" << i << ".) " << diag.getOptionText(i) << "\n";
 			}
