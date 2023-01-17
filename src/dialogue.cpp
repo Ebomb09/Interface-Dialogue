@@ -14,6 +14,53 @@ char* init_string(char* buffer, int start, int end){
 }
 
 
+handler::~handler(){
+
+	for(int i = 0; i < keywords.size(); i ++){
+
+		switch(keywords[i].type){
+
+			case Section: {
+
+				if(keywords[i].section.name)
+					delete [] keywords[i].section.name;
+				break;
+			}
+
+			case Dialogue: {
+
+				if(keywords[i].dialogue.speaker)
+					delete [] keywords[i].dialogue.speaker;
+
+				if(keywords[i].dialogue.text)
+					delete [] keywords[i].dialogue.text;
+
+				break;
+			}
+
+			case Option: {
+
+				if(keywords[i].option.variable)
+					delete [] keywords[i].option.variable;
+
+				if(keywords[i].option.options){
+
+					for(int j = 0; j < keywords[i].option.count; j ++){
+
+						if(keywords[i].option.options[j])
+							delete [] keywords[i].option.options[j];
+					}
+
+					delete [] keywords[i].option.options;
+				}
+				break;
+			}
+		}
+
+	}
+}
+
+
 /****
  * Opens a dialogue file
  *
@@ -91,7 +138,47 @@ bool handler::openFile(const char* name){
 							}
 						}
 					}
+
+					if(start == -1 || end == -1){
+						std::cerr << "Error no variable declared";
+						break;
+					}
+
+					// Determine assignment
+					int type = None;
+
+					for(int j = i+1; j < length; j ++){
+
+						if(buffer[j] != ' '){
+
+							if(strncmp(buffer+j, "options(", 8) == 0){
+								type = Option;
+								i += 7;
+								break;
+							}
+
+							if(strncmp(buffer+j, "add(", 4) == 0){
+								type = Add;
+								i += 3;
+								break;
+							}
+
+							if(strncmp(buffer+j, "sub(", 4) == 0){
+								type = Add;
+								i += 3;
+								break;
+							}
+						}
+
+						if(buffer[j] == '\n' || buffer[j] == '"' || buffer[j] == '(')
+							break;
+					}
 					
+					if(type == None){
+						std::cerr << "Error no function assigned";
+						break;
+					}
+
 					// Find number of options
 					int number_quotes = 0;
 
@@ -110,7 +197,7 @@ bool handler::openFile(const char* name){
 					}
 
 					keyword word;
-					word.type = Option;
+					word.type = type;
 					word.option.count = number_quotes/2;
 					word.option.variable = init_string(buffer, start, end);
 					word.option.options = new char*[number_quotes/2];
@@ -196,6 +283,10 @@ bool handler::openFile(const char* name){
 							mode = None;
 					}
 				}
+
+				if(buffer[i] == ')' && quote_start == -1)
+					mode = None;
+
 				break;
 			}
 		}
@@ -224,6 +315,12 @@ bool handler::gotoSection(const char* sectionName){
 
 int handler::next(){
 	position ++;
+
+	if(current() > Option){
+
+		next();
+	}
+
 	return current();
 }
 

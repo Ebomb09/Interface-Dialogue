@@ -8,7 +8,9 @@ enum keywordIdentifiers{
 	None,
 	Section,
 	Dialogue,
-	Option
+	Option,
+	Minus,
+	Add
 };
 
 struct keyword{
@@ -49,6 +51,8 @@ private:
 	std::vector<keyword> keywords;
 
 public:
+	~handler();
+
 	bool openFile(const char* name);
 
 	bool bindString(const char* var, std::string* ptr);
