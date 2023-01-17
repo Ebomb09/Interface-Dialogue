@@ -112,6 +112,7 @@ bool handler::openFile(const char* name){
 					mode = Section;
 				}
 
+				// Found a possible Dialogue Header
 				if(buffer[i] == ':' && startline != i){
 					start = startline;
 					end = i-1;
@@ -120,6 +121,7 @@ bool handler::openFile(const char* name){
 					mode = Dialogue;
 				}
 
+				// Found a possible Function Header
 				if(buffer[i] == '('){
 
 					// Find variable name if exists
@@ -146,7 +148,7 @@ bool handler::openFile(const char* name){
 						}
 					}
 
-					// Determine assignment
+					// Determine Function
 					int type = None;
 
 					for(int j = startline; j < i; j ++){
