@@ -120,18 +120,25 @@ bool handler::openFile(const char* name){
 					mode = Dialogue;
 				}
 
-				if(buffer[i] == '='){
+				if(buffer[i] == '('){
 
-					// Find variable name
+					// Find variable name if exists
+					bool variable = false;
 					start = -1;
 					end = -1;
 
-					for(int j = startline; j < length; j ++){
+					for(int j = startline; j < i; j ++){
 
-						if(buffer[j] != ' ' && buffer[j] != '\t'){
+						if(buffer[j] == '=' && start != -1){
+							variable = true;
+							break;
+						}
+
+						if(isalpha(buffer[j])){
 
 							if(start == -1){
 								start = j;
+								end = j;
 
 							}else{
 								end = j;
@@ -139,43 +146,41 @@ bool handler::openFile(const char* name){
 						}
 					}
 
-					if(start == -1 || end == -1){
-						std::cerr << "Error no variable declared";
-						break;
-					}
-
 					// Determine assignment
 					int type = None;
 
-					for(int j = i+1; j < length; j ++){
+					for(int j = startline; j < i; j ++){
 
-						if(buffer[j] != ' '){
+						if(isalpha(buffer[j])){
 
 							if(strncmp(buffer+j, "options(", 8) == 0){
 								type = Option;
-								i += 7;
 								break;
 							}
 
 							if(strncmp(buffer+j, "add(", 4) == 0){
 								type = Add;
-								i += 3;
 								break;
 							}
 
 							if(strncmp(buffer+j, "sub(", 4) == 0){
-								type = Add;
-								i += 3;
+								type = Subtract;
 								break;
 							}
+
+							if(strncmp(buffer+j, "if(", 3) == 0){
+								type = If;
+								break;
+							}
+
 						}
 
-						if(buffer[j] == '\n' || buffer[j] == '"' || buffer[j] == '(')
+						if(buffer[j] == '\n' || buffer[j] == '"')
 							break;
 					}
 					
 					if(type == None){
-						std::cerr << "Error no function assigned";
+						std::cerr << "Error no function assigned\n";
 						break;
 					}
 
@@ -187,7 +192,7 @@ bool handler::openFile(const char* name){
 						if(buffer[j] == '"')
 							number_quotes ++;
 						
-						if(buffer[j] == '\n' || j >= length-1)
+						if(buffer[j] == '\n' || buffer[j] == ')')
 							break;
 					}
 
@@ -196,10 +201,16 @@ bool handler::openFile(const char* name){
 						break;
 					}
 
+					// Set up word and use the default variable if none declared
 					keyword word;
 					word.type = type;
 					word.option.count = number_quotes/2;
-					word.option.variable = init_string(buffer, start, end);
+					if(variable){
+						word.option.variable = init_string(buffer, start, end);
+					}else{
+						word.option.variable = new char[8];
+						strcpy(word.option.variable, "default");
+					}
 					word.option.options = new char*[number_quotes/2];
 
 					keywords.push_back(word);
@@ -317,7 +328,7 @@ int handler::next(){
 	position ++;
 
 	if(current() > Option){
-
+		doFunction();
 		next();
 	}
 
@@ -375,4 +386,39 @@ const char* handler::getOptionText(int index){
 
 void handler::select(int option){
 
+	if(current() == Option && option >= 0 && option < getOptionCount()){
+		assign(keywords[position].option.variable, option);
+		next();
+	}
+}
+
+
+void handler::doFunction(){
+
+}
+
+
+int handler::getvar(const char* var){
+
+	for(int i = 0; i < variables.size(); i ++){
+
+		if(strcmp(var, variables[i].first) == 0)
+			return variables[i].second;
+	}
+
+	std::cerr << "Error no variable named " << var << " found\n";
+	return 0;	
+}
+
+
+void handler::assign(const char* var, int val){
+
+	for(int i = 0; i < variables.size(); i ++){
+
+		if(strcmp(var, variables[i].first) == 0){
+			variables[i].second = val;
+			return;
+		}
+	}
+	variables.push_back(std::pair<const char*, int>(var, val));
 }

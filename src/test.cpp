@@ -25,6 +25,7 @@ int main(int argc, char* argv[]){
 			std::cout << "Please select a option... ";
 
 			std::cin >> x;
+			std::cin.ignore();
 
 		}else{
 			std::cout << "Press [Enter] to continue... ";

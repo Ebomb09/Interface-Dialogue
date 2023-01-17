@@ -3,14 +3,17 @@
 
 #include <cstring>
 #include <vector>
+#include <utility>
 
 enum keywordIdentifiers{
 	None,
 	Section,
 	Dialogue,
 	Option,
-	Minus,
-	Add
+	/* Sub Option Specifiers for functions */
+	Subtract,
+	Add,
+	If
 };
 
 struct keyword{
@@ -47,16 +50,20 @@ struct keyword{
 class handler{
 
 private:
+	/* State Control */
 	int start, position;
 	std::vector<keyword> keywords;
+	std::vector<std::pair<const char*, int> > variables;
 
 public:
 	~handler();
 
 	bool openFile(const char* name);
 
-	bool bindString(const char* var, std::string* ptr);
-	bool bindInt(const char* var, int* ptr);
+	/* Inter Process Communication */
+	int getvar(const char*);
+	void assign(const char* var, int val);
+	void doFunction();
 
 	/* Process control */
 	bool gotoSection(const char* sectionName = "");
