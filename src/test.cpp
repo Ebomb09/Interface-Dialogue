@@ -11,7 +11,7 @@ int main(int argc, char* argv[]){
 	int gameLoop = diag.next();
 
 	while(gameLoop != None){
-		int x;
+		int x = -1;
 
 		if(gameLoop == Dialogue)
 			std::cout << "[" << diag.getSpeaker() << "]\t" << diag.getText() << "\n";
@@ -32,7 +32,10 @@ int main(int argc, char* argv[]){
 			std::cin.ignore();
 		}
 
-		if(gameLoop == Dialogue || (gameLoop == Option && x >= 0))
+		if(gameLoop == Dialogue)
+			gameLoop = diag.next();
+
+		if(gameLoop == Option && diag.select(x))
 			gameLoop = diag.next();
 	}
 

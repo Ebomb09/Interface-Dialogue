@@ -370,7 +370,7 @@ const char* handler::getText(){
 
 int handler::getOptionCount(){
 
-	if(keywords[position].type == Option)
+	if(keywords[position].type >= Option)
 		return keywords[position].option.count;
 	
 	return 0;
@@ -380,23 +380,71 @@ int handler::getOptionCount(){
 const char* handler::getOptionText(int index){
 
 	if(index >= getOptionCount())
-		return "";
+		return NULL;
 
 	return keywords[position].option.options[index];
 }
 
 
-void handler::select(int option){
+bool handler::select(int option){
 
 	if(current() == Option && option >= 0 && option < getOptionCount()){
 		assign(keywords[position].option.variable, option);
-		next();
+		return true;
 	}
+
+	return false;
 }
 
 
 void handler::doFunction(){
 
+	switch(keywords[position].type){
+
+		case Subtract:{
+
+			if(getOptionCount() == 2){
+				int x = getvar(getOptionText(0));
+				int y = getvar(getOptionText(1));
+				assign(keywords[position].option.variable, x-y);
+			}
+			break;
+		}
+
+		case Add:{
+
+			if(getOptionCount() == 2){
+				int x = getvar(getOptionText(0));
+				int y = getvar(getOptionText(1));
+				assign(keywords[position].option.variable, x+y);
+			}
+			break;
+		}
+
+		// Check if condition and when true do the next line
+		case If:{
+
+			if(getOptionCount() == 3){
+				const char* symbol = getOptionText(1);
+				int x = getvar(getOptionText(0));
+				int y = getvar(getOptionText(2));
+				int cond = 0;
+
+				if(strcmp(symbol, "<") == 0)		cond = x<y;
+				else if(strcmp(symbol, ">") == 0)	cond = x>y;
+				else if(strcmp(symbol, "<=") == 0)	cond = x<=y;
+				else if(strcmp(symbol, ">=") == 0)	cond = x>=y;
+				else if(strcmp(symbol, "==") == 0)	cond = x==y;
+				
+				assign(keywords[position].option.variable, cond);				
+
+				if(!cond)
+					position ++;
+			}
+			break;
+		}
+
+	}
 }
 
 
@@ -408,8 +456,8 @@ int handler::getvar(const char* var){
 			return variables[i].second;
 	}
 
-	std::cerr << "Error no variable named " << var << " found\n";
-	return 0;	
+	// Try to convert or error 0
+	return strtol(var, NULL, 10);
 }
 
 

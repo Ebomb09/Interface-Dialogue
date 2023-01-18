@@ -76,7 +76,7 @@ public:
 
 	int getOptionCount();
 	const char* getOptionText(int index);
-	void select(int option);
+	bool select(int option);
 };
 
 #endif
