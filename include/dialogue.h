@@ -66,7 +66,7 @@ public:
 	void doFunction();
 
 	/* Process control */
-	bool gotoSection(const char* sectionName = "");
+	bool gotoSection(const char* sectionName);
 	int next();
 	int current();
 
