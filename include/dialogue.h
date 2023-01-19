@@ -13,7 +13,8 @@ enum keywordIdentifiers{
 	/* Sub Option Specifiers for functions */
 	Subtract,
 	Add,
-	If
+	If,
+	GoTo
 };
 
 struct keyword{
@@ -76,6 +77,7 @@ public:
 
 	int getOptionCount();
 	const char* getOptionText(int index);
+	const char* getOptionVariable();
 	bool select(int option);
 };
 

@@ -175,6 +175,11 @@ bool handler::openFile(const char* name){
 								break;
 							}
 
+							if(strncmp(buffer+j, "goto(", 5) == 0){
+								type = GoTo;
+								break;
+							}
+
 						}
 
 						if(buffer[j] == '\n' || buffer[j] == '"')
@@ -379,17 +384,29 @@ int handler::getOptionCount(){
 
 const char* handler::getOptionText(int index){
 
-	if(index >= getOptionCount())
+	if(current() < Option)
+		return NULL;
+
+	if(index < 0 || index >= getOptionCount())
 		return NULL;
 
 	return keywords[position].option.options[index];
 }
 
 
+const char* handler::getOptionVariable(){
+
+	if (current() >= Option)
+		return keywords[position].option.variable;
+
+	return NULL;
+}
+
+
 bool handler::select(int option){
 
 	if(current() == Option && option >= 0 && option < getOptionCount()){
-		assign(keywords[position].option.variable, option);
+		assign(getOptionVariable(), option);
 		return true;
 	}
 
@@ -406,7 +423,7 @@ void handler::doFunction(){
 			if(getOptionCount() == 2){
 				int x = getvar(getOptionText(0));
 				int y = getvar(getOptionText(1));
-				assign(keywords[position].option.variable, x-y);
+				assign(getOptionVariable(), x-y);
 			}
 			break;
 		}
@@ -416,7 +433,7 @@ void handler::doFunction(){
 			if(getOptionCount() == 2){
 				int x = getvar(getOptionText(0));
 				int y = getvar(getOptionText(1));
-				assign(keywords[position].option.variable, x+y);
+				assign(getOptionVariable(), x+y);
 			}
 			break;
 		}
@@ -436,10 +453,22 @@ void handler::doFunction(){
 				else if(strcmp(symbol, ">=") == 0)	cond = x>=y;
 				else if(strcmp(symbol, "==") == 0)	cond = x==y;
 				
-				assign(keywords[position].option.variable, cond);				
+				assign(getOptionVariable(), cond);				
 
 				if(!cond)
 					position ++;
+			}
+			break;
+		}
+
+		case GoTo:{
+
+			if(getOptionCount() == 1){
+				const char* var = getOptionVariable();
+				const char* section = getOptionText(0);
+
+				bool success = gotoSection(section);
+				assign(var, success);
 			}
 			break;
 		}
