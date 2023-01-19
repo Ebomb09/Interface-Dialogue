@@ -1,12 +1,17 @@
-.PHONY = all clean
+.PHONY = all clean init run-test
 
 INCLUDE_DIR = include
 LIBRARY_DIR = lib
 
-all: lib bin obj lib/libdialogue.a bin/test
+all: lib/libdialogue.a bin/test
 
 clean:
 	rm bin/test lib/libdialogue.a obj/test.o obj/dialogue.o
+
+init: lib bin obj
+
+run-test: bin/test
+	"./$<"
 
 lib:
 	mkdir lib
