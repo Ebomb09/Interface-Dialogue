@@ -11,7 +11,7 @@ clean:
 init: lib bin obj
 
 run-test: bin/test
-	"./$<"
+	cd bin && "./$<"
 
 lib bin obj:
 	mkdir "$@"

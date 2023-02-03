@@ -73,7 +73,7 @@ handler::~handler(){
 bool handler::openFile(const char* name){
 	std::ifstream file(name);
 	
-	if(file.bad()){
+	if(file.fail()){
 		file.close();
 		return false;
 	}
@@ -323,6 +323,7 @@ bool handler::gotoSection(const char* sectionName){
 		if(keywords[i].type == Section && strcmp(sectionName, keywords[i].section.name) == 0){
 			start = i;
 			position = i;
+			next();
 			return true;
 		}
 	}
