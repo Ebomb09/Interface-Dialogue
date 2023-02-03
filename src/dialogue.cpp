@@ -2,7 +2,16 @@
 #include <fstream>
 #include "dialogue.h"
 
-// Size of the string to account the NULL character
+using namespace dialogue;
+
+/**
+ * Initializes a copy of a string
+ * 
+ * Creates a copy of a string based on the start position
+ * and the end position. If start == end then get the single 
+ * character as a string. Adds 1 to the expected length
+ * to fulfill the required NULL character.
+ */
 char* init_string(char* buffer, int start, int end){
 	int length = end-start+2;
 	char* ptr = new char[length];
@@ -61,15 +70,6 @@ handler::~handler(){
 }
 
 
-/****
- * Opens a dialogue file
- *
- * Close whatever file is being used for the text resources
- * and open a new one.
- *
- * @param name	- File Name
- * @return		- Successful or not
- */
 bool handler::openFile(const char* name){
 	std::ifstream file(name);
 	
@@ -77,6 +77,8 @@ bool handler::openFile(const char* name){
 		file.close();
 		return false;
 	}
+
+	keywords.clear();
 
 	char* buffer;
 
