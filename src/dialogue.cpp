@@ -73,7 +73,7 @@ handler::~handler(){
 bool handler::openFile(const char* name){
 	std::ifstream file(name);
 	
-	if(file.bad()){
+	if(file.fail()){
 		file.close();
 		return false;
 	}
