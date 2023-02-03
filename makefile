@@ -13,14 +13,8 @@ init: lib bin obj
 run-test: bin/test
 	"./$<"
 
-lib:
-	mkdir lib
-
-obj:
-	mkdir obj
-
-bin:
-	mkdir bin
+lib bin obj:
+	mkdir "$@"
 
 lib/libdialogue.a: obj/dialogue.o
 	ar rcs "$@" "$<"
