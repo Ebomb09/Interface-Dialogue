@@ -9,9 +9,11 @@ Once an object is appropriately setup you can use `gotoSection()`, `current()`, 
 
 ## Format
 Dialogue scripts follow a similar format to ini: 
-> [%SECTION_NAME%]
-> %SPEAKER% : %TEXT%
-> %optional var% = %command%("%args%")
+```
+[%SECTION_NAME%]
+%SPEAKER% : "%TEXT%"
+%optional var% = %command%("%args%")
+```
 
 ### Commands
 - options("option1" "option2" ... "option n") = `select(int)`
