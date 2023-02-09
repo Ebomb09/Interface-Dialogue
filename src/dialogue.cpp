@@ -172,6 +172,11 @@ bool handler::openFile(const char* name){
 								break;
 							}
 
+							if(strncmp(buffer+j, "assign(", 4) == 0){
+								type = Assign;
+								break;
+							}
+
 							if(strncmp(buffer+j, "if(", 3) == 0){
 								type = If;
 								break;
@@ -461,6 +466,18 @@ void handler::doFunction(){
 				if(!cond)
 					position ++;
 			}
+			break;
+		}
+
+		case Assign: {
+
+			if(getOptionCount() == 2){
+				const char* symbol = getOptionText(0);
+				int value = getvar(getOptionText(1));
+				
+				assign(symbol, value);
+			}
+
 			break;
 		}
 

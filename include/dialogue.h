@@ -15,6 +15,7 @@ namespace dialogue{
 		/* Sub Option Specifiers for functions */
 		Subtract,
 		Add,
+		Assign,
 		If,
 		GoTo
 	};
