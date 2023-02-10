@@ -438,7 +438,10 @@ void handler::doFunction(){
 				int x = getvar(getOptionText(0));
 				int y = getvar(getOptionText(1));
 				assign(getOptionVariable(), x-y);
-			}
+
+			}else
+				std::cerr << "Expected function sub(\"<var1>\" \"<var2>\"): 2 arguments\n";
+
 			break;
 		}
 
@@ -448,7 +451,10 @@ void handler::doFunction(){
 				int x = getvar(getOptionText(0));
 				int y = getvar(getOptionText(1));
 				assign(getOptionVariable(), x+y);
-			}
+			
+			}else
+				std::cerr << "Expected function add(\"<var1>\" \"<var2>\"): 2 arguments\n";
+
 			break;
 		}
 
@@ -471,7 +477,10 @@ void handler::doFunction(){
 
 				if(!cond)
 					position ++;
-			}
+
+			}else
+				std::cerr << "Expected function if(\"<var1>\" \"<cond>\" \"<var2>\"): 3 arguments\n";
+
 			break;
 		}
 
@@ -482,7 +491,9 @@ void handler::doFunction(){
 				int value = getvar(getOptionText(1));
 				
 				assign(symbol, value);
-			}
+			
+			}else
+				std::cerr << "Expected function assign(\"<var1>\" \"<var2>\"): 2 arguments\n";
 
 			break;
 		}
@@ -495,11 +506,20 @@ void handler::doFunction(){
 
 				bool success = gotoSection(section);
 				assign(var, success);
-			}
+			
+			}else
+				std::cerr << "Expected function goto(\"<section>\"): 1 argument\n";
+
 			break;
 		}
 
 		case Exit: {
+	
+			if(getOptionCount() > 0){
+				std::cerr << "Expected function exit(): 0 arguments\n";
+				break;
+			}
+
 			const char* var = getOptionVariable();
 			assign(var, 1);
 			position = -1;
