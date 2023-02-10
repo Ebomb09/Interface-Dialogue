@@ -8,22 +8,22 @@ all: lib/libdialogue.a bin/test
 clean:
 	rm bin/test lib/libdialogue.a obj/test.o obj/dialogue.o
 
-init: lib bin obj
-
 run-test: bin/test
+	@cp -r resource bin
 	cd $(dir $<) && ./$(notdir $<)
 
-lib bin obj:
-	mkdir "$@"
-
 lib/libdialogue.a: obj/dialogue.o
+	@mkdir -p $(dir $@)
 	ar rcs "$@" "$<"
 
 obj/dialogue.o: src/dialogue.cpp
+	@mkdir -p $(dir $@)
 	${CXX} "$<" -c -o "$@" -I"${INCLUDE_DIR}"
 
 obj/test.o: src/test.cpp
+	@mkdir -p $(dir $@)
 	${CXX} "$<" -c -o "$@" -I"${INCLUDE_DIR}"
 
 bin/test: obj/test.o lib/libdialogue.a
+	@mkdir -p $(dir $@)
 	${CXX} "$<" -o "$@" -L"${LIBRARY_DIR}" -ldialogue
