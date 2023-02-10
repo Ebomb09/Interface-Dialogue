@@ -1,0 +1,6 @@
+.cache
+.DS_Store
+bin
+obj
+lib
+compile_commands.json
