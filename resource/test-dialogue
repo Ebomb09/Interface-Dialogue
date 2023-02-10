@@ -4,8 +4,10 @@ Guy:"I am Hungry"
 Shop Keeper: "For what you little cretin?"
 Guy:  "Meetza Pizza"
 Ethan: "Bruh what's wrong with you"
-x = "Buy the meetza pizza" "Don't Buy"
+x = options("Buy the meetza pizza" "Don't Buy")
+
+y = if("x" "==" "1")
+goto("Section1")
 
 [Section1-Buy]
-
-gold -= 100
+gold = sub("100")
