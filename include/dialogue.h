@@ -17,7 +17,8 @@ namespace dialogue{
 		Add,
 		Assign,
 		If,
-		GoTo
+		GoTo,
+		Exit
 	};
 
 	class handler;

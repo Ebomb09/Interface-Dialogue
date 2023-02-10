@@ -172,7 +172,7 @@ bool handler::openFile(const char* name){
 								break;
 							}
 
-							if(strncmp(buffer+j, "assign(", 4) == 0){
+							if(strncmp(buffer+j, "assign(", 7) == 0){
 								type = Assign;
 								break;
 							}
@@ -187,6 +187,10 @@ bool handler::openFile(const char* name){
 								break;
 							}
 
+							if(strncmp(buffer+j, "exit(", 5) == 0){
+								type = Exit;
+								break;
+							}
 						}
 
 						if(buffer[j] == '\n' || buffer[j] == '"')
@@ -210,11 +214,6 @@ bool handler::openFile(const char* name){
 							break;
 					}
 
-					if(number_quotes < 2){
-						std::cerr << "Error no options provided\n";
-						break;
-					}
-
 					// Set up word and use the default variable if none declared
 					keyword word;
 					word.type = type;
@@ -225,7 +224,11 @@ bool handler::openFile(const char* name){
 						word.option.variable = new char[8];
 						strcpy(word.option.variable, "default");
 					}
-					word.option.options = new char*[number_quotes/2];
+
+					if(number_quotes >= 2)
+						word.option.options = new char*[number_quotes/2];
+					else
+						word.option.options = NULL;
 
 					keywords.push_back(word);
 
@@ -292,6 +295,9 @@ bool handler::openFile(const char* name){
 
 			case Option: {
 
+				if(end >= keywords[start].option.count)
+					mode = None;
+
 				if(buffer[i] == '"'){
 
 					if(quote_start == -1){
@@ -303,9 +309,6 @@ bool handler::openFile(const char* name){
 						keywords[start].option.options[end++] = init_string(buffer, quote_start, quote_end);
 
 						quote_start = -1;
-
-						if(end >= keywords[start].option.count)
-							mode = None;
 					}
 				}
 
@@ -340,7 +343,10 @@ bool handler::gotoSection(const char* sectionName){
 
 
 int handler::next(){
-	position ++;
+
+	// Increment only if there not on nothingness
+	if(current() != None)
+		position ++;
 
 	if(current() > Option){
 		doFunction();
@@ -353,7 +359,7 @@ int handler::next(){
 
 int handler::current(){
 
-	if(position >= keywords.size())
+	if(position >= keywords.size() || position < 0)
 		return None;
 
 	if(keywords[position].type == Section && position != start)
@@ -490,6 +496,13 @@ void handler::doFunction(){
 				bool success = gotoSection(section);
 				assign(var, success);
 			}
+			break;
+		}
+
+		case Exit: {
+			const char* var = getOptionVariable();
+			assign(var, 1);
+			position = -1;
 			break;
 		}
 
