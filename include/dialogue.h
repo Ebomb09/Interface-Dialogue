@@ -6,7 +6,7 @@
 #include <utility>
 
 namespace dialogue{ 
-	struct keyword;
+
 	enum keywordIdentifiers{
 		None,
 		Section,
@@ -21,6 +21,7 @@ namespace dialogue{
 		Exit
 	};
 
+	struct keyword;
 	class handler;
 };
 

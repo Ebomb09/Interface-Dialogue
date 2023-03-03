@@ -25,6 +25,12 @@ char* init_string(char* buffer, int start, int end){
 
 handler::~handler(){
 
+	// Free data from variables names
+	for(int i = 0; i < variables.size(); i ++){
+		delete [] variables[i].first;
+	}
+
+	// Free data from keywords
 	for(int i = 0; i < keywords.size(); i ++){
 
 		switch(keywords[i].type){
@@ -552,5 +558,9 @@ void handler::assign(const char* var, int val){
 			return;
 		}
 	}
-	variables.push_back(std::pair<const char*, int>(var, val));
+
+	char* str = new char[strlen(var)+1];
+	strcpy(str, var);
+
+	variables.push_back(std::pair<const char*, int>(str, val));
 }
